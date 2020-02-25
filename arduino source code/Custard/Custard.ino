@@ -7,7 +7,10 @@
 //  Thanks to Kataze @kataze  for making most of this work
 //  Thanks to Kbooki @kbooki for the badge art
 //  Thanks to Mark Kriegsman @MarkKriegsman for the origianl fastled demo code this is based on
-//  Thanks to the F2 attendeed that bought this dumb thing <3
+//  Thanks to Adafruit for the touchio library
+//  Thanks to the F2 attendees that bought this dumb thing <3
+
+//  since you looked at the source code I got a bonus for you...  add a couple extra neopixels to the SAO port, this supports it.  ;)
 
 #include <FastLED.h>
 #include "Adafruit_FreeTouch.h"
@@ -21,41 +24,49 @@ FASTLED_USING_NAMESPACE  //I have no idea what this means but if I remove it it 
 #define COLOR_ORDER RGB
 #define NUM_LEDS    10
 CRGB leds[NUM_LEDS];
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
 
 #define BRIGHTNESS         64 //bump this up if you want a brighter donkey
 #define FRAMES_PER_SECOND  120
 
-
-
-
-void setup() {
-
-Serial.begin(115200);
-
-// tell FastLED about the LED strip configuration
-FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  
-// set master brightness control
-FastLED.setBrightness(BRIGHTNESS);
-  
-}
-
 // List of patterns to cycle through.  Each is defined as a separate function below.
-typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint16_t gHue = 0; // rotating "base color" used by many of the patterns
 
 unsigned long lastPress;
 bool active = true;
+bool debounce;
+
+
+
+
+
+void setup() {
+
+  Serial.begin(115200);
+
+  if (! qt_4.begin())  //I guess this starts the cap touch I dunno 
+    Serial.println("Failed to begin qt on pin A3");
+
+  // tell FastLED about the LED strip configuration
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  
+  // set master brightness control
+  FastLED.setBrightness(BRIGHTNESS);
+
+  
+}
+
+typedef void (*SimplePatternList[])();
+  SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
 
 void loop()
 {
   int counter, result = 0;
   counter = millis();
   result = qt_4.measure();
-  bool debounce;
 
   //Serial.println(result);
   
@@ -101,8 +112,8 @@ void loop()
 
 }
 
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+  
 void nextPattern()
 {
   // add one to the current pattern number, and wrap around at the end
@@ -112,7 +123,7 @@ void nextPattern()
 void rainbow()
 {
   // FastLED's built-in rainbow generator
-  fill_rainbow( leds, NUM_LEDS, gHue, 7);
+  fill_rainbow( leds, NUM_LEDS, gHue, 20);
 }
 
 void rainbowWithGlitter()

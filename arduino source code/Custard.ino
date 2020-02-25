@@ -8,19 +8,13 @@
 //  Thanks to Kbooki @kbooki for the badge art
 //  Thanks to Mark Kriegsman @MarkKriegsman for the origianl fastled demo code this is based on
 //  Thanks to the F2 attendeed that bought this dumb thing <3
-//  
-//
-
-
 
 #include <FastLED.h>
 #include "Adafruit_FreeTouch.h"
 
 
 Adafruit_FreeTouch qt_4 = Adafruit_FreeTouch(A3, OVERSAMPLE_4, RESISTOR_50K, FREQ_MODE_NONE);
-
-FASTLED_USING_NAMESPACE
-
+FASTLED_USING_NAMESPACE  //I have no idea what this means but if I remove it it breaks
 
 #define DATA_PIN    4
 #define LED_TYPE    WS2812
@@ -30,22 +24,6 @@ CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS         64 //bump this up if you want a brighter donkey
 #define FRAMES_PER_SECOND  120
-
-void setup() {
-
-  if (! qt_4.begin())
-    Serial.println("Failed to begin qt on pin A3");
-
-  Serial.begin(115200);
-
-
-  // tell FastLED about the LED strip configuration
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  
-  // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
-  
-}
 
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
@@ -57,6 +35,20 @@ uint16_t gHue = 0; // rotating "base color" used by many of the patterns
 
 unsigned long lastPress;
 bool active = true;
+
+void setup() {
+
+Serial.begin(115200);
+
+// tell FastLED about the LED strip configuration
+FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  
+// set master brightness control
+FastLED.setBrightness(BRIGHTNESS);
+  
+}
+
+
 void loop()
 {
   int counter, result = 0;
